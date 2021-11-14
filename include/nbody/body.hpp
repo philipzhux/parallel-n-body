@@ -105,7 +105,7 @@ class BodyPool {
     // if after the collision, we do not separate the bodies a little bit, it may
     // results in strange outcomes like infinite acceleration.
     // hence, we will need to set up a ratio for separation.
-    static constexpr double COLLISION_RATIO = 0.01;
+    static constexpr double COLLISION_RATIO = 0.001;
     public:
 
     static inline size_t getLength(const size_t &size, const size_t &proc, const size_t &rank){
@@ -144,22 +144,9 @@ class BodyPool {
         if (distance < radius) {
             distance = radius;
         }
-        if (i.collide(j, radius)) {
-        // auto dot_prod = delta_x * (i.get_vx() - j.get_vx())
-        //                 + delta_y * (i.get_vy() - j.get_vy());
-        // auto scalar = 2 / (i.get_m() + j.get_m()) * dot_prod / distance_square;
-        // i.get_vx() -= sign_s * scalar * delta_x * j.get_m();
-        // i.get_vy() -= sign_s * scalar * delta_y * j.get_m();
-        // // now relax the distance a bit: after the collision, there must be
-        // // at least (ratio * radius) between them
-        // i.get_x() += sign_s * delta_x / distance * ratio * radius / 2.0;
-        // i.get_y() += sign_s * delta_y / distance * ratio * radius / 2.0;
-        }
-        else{
         auto scalar = gravity / distance_square / distance;
         i.get_ax()  -= sign_s * scalar * delta_x * j.get_m();
         i.get_ay() -= sign_s * scalar * delta_y * j.get_m();
-        }
     }        
     }
 #ifdef MPI

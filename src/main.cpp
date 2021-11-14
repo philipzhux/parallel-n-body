@@ -28,8 +28,8 @@ int main(int argc, char **argv) {
         static int iteration_u = INT32_MAX;
         static float gravity = 100;
         static float space = 800;
-        static float radius = 5;
-        static int bodies = 20;
+        static float radius = 2;
+        static int bodies = 100;
         static float elapse = 0.001;
         static ImVec4 color = ImVec4(1.0f, 1.0f, 0.4f, 1.0f);
         static float max_mass = 50;
@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
                         ImGui::GetIO().Framerate);
             ImGui::DragFloat("Space", &current_space, 10, 200, 1600, "%f");
             ImGui::DragFloat("Gravity", &gravity, 0.5, 0, 1000, "%f");
-            ImGui::DragFloat("Radius", &radius, 0.5, 2, 20, "%f");
-            ImGui::DragInt("Bodies", &current_bodies, 1, 2, 100, "%d");
+            ImGui::DragFloat("Radius", &radius, 0.5, 0.5, 20, "%f");
+            ImGui::DragInt("Bodies", &current_bodies, 1, 2, 1000, "%d");
             ImGui::DragInt("Iterations", &current_iteration_u, 100, 100, INT32_MAX, "%d");
             ImGui::DragFloat("Elapse", &elapse, 0.001, 0.001, 10, "%f");
             ImGui::DragFloat("Max Mass", &current_max_mass, 0.5, 5, 100, "%f");

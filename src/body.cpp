@@ -55,9 +55,6 @@ double Body::delta_y(Body &that) {
     return Body::get_y() - that.get_y();
 }
 
-bool Body::collide(Body &that, double radius) {
-    return Body::distance_square(that) <= radius * radius;
-}
 
 // collision with wall
 void Body::handle_wall_collision(double position_range, double radius) {
