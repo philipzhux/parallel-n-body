@@ -46,29 +46,32 @@ int main(int argc, char **argv) {
         int c;
         int gui_flag = 0;
         opterr = 0;
-        while ((c = getopt (argc, argv, "gi:b:e:t:")) != -1);
-        switch (c)
-        {
-            case 'g':
-                gui_flag = 1;
-                break;
-            case 'i':
-                iteration_u = atoi(optarg);
-                break;
-            case 'b':
-                bodies = atoi(optarg);
-                break;
-            case 'e':
-                elapse = atof(optarg);
-                break;
-            case 't':
-                proc = atoi(optarg);
-                break;
-            case '?':
-                break;
-            default:
-                break;
+        while ((c = getopt (argc, argv, "gi:b:e:t:")) != -1){
+            switch (c)
+            {
+                case 'g':
+                    gui_flag = 1;
+                    break;
+                case 'i':
+                    iteration_u = atoi(optarg);
+                    break;
+                case 'b':
+                    bodies = atoi(optarg);
+                    break;
+                case 'e':
+                    elapse = atof(optarg);
+                    break;
+                case 't':
+                    proc = atoi(optarg);
+                    break;
+                case '?':
+                    break;
+                default:
+                    break;
+            }
         }
+        
+        std::cout<<"interation_u = "<<iteration_u<<std::endl;
         BodyPool pool(static_cast<size_t>(bodies), space, max_mass, iteration_u);
         if(gui_flag){
             graphic::GraphicContext context{

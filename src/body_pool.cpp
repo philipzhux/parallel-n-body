@@ -140,8 +140,8 @@ void BodyPool::master_cal(double elapse,
     auto begin = std::chrono::high_resolution_clock::now();
     std::vector<Body> snapshot = BodyPool::bodies;
     omp_set_num_threads(proc);
-    #pragma omp parallel for shared(body,radius,gravity,snapshot,elapse, position_range) default(none)
-    for(int i = 0; i<bodies.size(); ++i) {
+    #pragma omp parallel for shared(bodies,radius,gravity,snapshot,elapse, position_range) default(none)
+    for(size_t i = 0; i<bodies.size(); ++i) {
         cnu(bodies[i],radius,gravity,snapshot);
         bodies[i].update_for_tick(elapse, position_range, radius);
     }

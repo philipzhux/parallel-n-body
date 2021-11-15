@@ -4,6 +4,7 @@ project(csc4005_imgui CUDA CXX)
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(OpenMP REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(MPI REQUIRED)
@@ -61,9 +62,9 @@ target_compile_definitions(core PUBLIC -DImDrawIdx=unsigned)
 target_compile_definitions(nb_cuda PRIVATE -DFONT_PATH=\"${FONT_PATH}\")
 target_link_libraries(nb_cuda ${CUDA_LIBRARIES})
 target_compile_options(nb_omp PRIVATE
-          $<$<COMPILE_LANGUAGE:C>:"${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}">
-          $<$<COMPILE_LANGUAGE:CXX>:"${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}">)
-target_link_options(nb_omp PRIVATE "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+          $<$<COMPILE_LANGUAGE:C>:${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}>
+          $<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}>)
+target_link_options(nb_omp PRIVATE ${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS} -fopenmp=libomp)
 if (WIN32)
     target_link_options(nb_cuda BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
 endif()
