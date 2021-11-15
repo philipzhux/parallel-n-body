@@ -123,9 +123,29 @@ void BodyPool::master_cal(double elapse,
             pthread_create(threads+i,NULL,BodyPool::slave_cal,para+i);
         }
         for(int i=0;i<static_cast<int>(proc-1);i++) pthread_join(threads[i],NULL);
-    
+    }
     auto end = std::chrono::high_resolution_clock::now();
     duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }
+#endif
+
+
+#ifdef OPENMP
+void BodyPool::master_cal(double elapse,
+                        double gravity,
+                        double position_range,
+                        double radius, size_t proc) {
+    BodyPool::clear_acceleration();
+    BodyPool::iteration++;
+    auto begin = std::chrono::high_resolution_clock::now();
+    std::vector<Body> snapshot = BodyPool::bodies;
+    omp_set_num_threads(proc);
+    #pragma omp parallel for shared(body,radius,gravity,snapshot,elapse, position_range) default(none)
+    for(int i = 0; i<bodies.size(); ++i) {
+        cnu(bodies[i],radius,gravity,snapshot);
+        bodies[i].update_for_tick(elapse, position_range, radius);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }
 #endif

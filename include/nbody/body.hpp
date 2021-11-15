@@ -12,6 +12,9 @@
 #ifdef PTHREAD
 #include <pthread.h>
 #endif
+#ifdef OPENMP
+#include <omp.h>
+#endif
 
 
 
