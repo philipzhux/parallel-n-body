@@ -1,6 +1,3 @@
-//
-// Created by schrodinger on 9/9/21.
-//
 #pragma once
 
 #include <imgui.h>

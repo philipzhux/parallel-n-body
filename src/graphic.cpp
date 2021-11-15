@@ -1,6 +1,3 @@
-//
-// Created by schrodinger on 9/9/21.
-//
 #include <graphic/graphic.hpp>
 
 graphic::GraphicContext::GraphicContext(std::string title, int height, int width, graphic::VSyncFlag vsync_flag,
