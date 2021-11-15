@@ -1,4 +1,9 @@
-#include <nbody/cuda.hpp>
+#include <nbody/cuda_host.hpp>
+#include <graphic/graphic.hpp>
+#include <chrono>
+//#include <cuda_runtime_api.h>
+
+
 BodyPool::BodyPool(size_t size, double position_range, double mass_range, int iteration_u):
         iteration{0},iteration_u{iteration_u},duration{0},bodies{} {
     std::random_device device;
@@ -40,20 +45,11 @@ size_t BodyPool::size() {
 void BodyPool::master_cal(double elapse,
                         double gravity,
                         double position_range,
-                        double radius, size_t proc) {
+                        double radius, size_t proc, int block_dim, int g_dim) {
     BodyPool::clear_acceleration();
     BodyPool::iteration++;
     auto begin = std::chrono::high_resolution_clock::now();
-    Body* device_bodies, device_snapshot;
-    cudaMalloc((void**)&device_bodies,size()*sizeof(Body));
-    cudaMalloc((void**)&device_snapshot,size()*sizeof(Body));
-    cudaMemcpy(device_bodies, bodies.data(), size()*sizeof(Body), cudaMemcpyHostToDevice);
-    cudaMemcpy(device_snapshot, bodies.data(), size()*sizeof(Body), cudaMemcpyHostToDevice);
-    BodyPool::slave_cal<<<grid_size,block_size>>>(device_bodies, device_snapshot,size(),elapse,gravity,position_range,radius);
-    cudaDeviceSynchronize();
-    cudaMemcpy(device_bodies, bodies.data(), size()*sizeof(Body), cudaMemcpyDeviceToHost);
-    cudaFree(device_bodies);
-    cudaFree(device_snapshot);
+    master_cal_cu(elapse,gravity,position_range,radius,proc,&(bodies[0]),size(),block_dim, g_dim);
     auto end = std::chrono::high_resolution_clock::now();
-    duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    duration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }
