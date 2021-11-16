@@ -62,7 +62,9 @@ int main(int argc, char **argv) {
                     elapse = atof(optarg);
                     break;
                 case 't':
+                    #if defined(OPENMP) || defined(PTHREAD)
                     proc = atoi(optarg);
+                    #endif
                     break;
                 case '?':
                     break;

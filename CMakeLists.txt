@@ -31,32 +31,40 @@ file(GLOB IMGUI_SRC
         imgui/misc/cpp/imgui_stdlib.cpp
         )
 add_library(core STATIC ${IMGUI_SRC})
-file(GLOB CSC4005_PROJECT_SRC src/*.cpp src/*.c)
+file(GLOB ALL_OTHER_SRC src/*.cpp src/*.c)
 file(GLOB CUDA_SRC src/cuda/*.cpp src/cuda/*.c src/cuda/*.cu)
 add_executable(nb_cuda ${CUDA_SRC})
+add_executable(nb_mpi ${ALL_OTHER_SRC})
+add_executable(nb_pthread ${ALL_OTHER_SRC})
+add_executable(nb_omp ${ALL_OTHER_SRC})
+add_executable(nb_hybrid ${ALL_OTHER_SRC})
+get_filename_component(FONT_PATH imgui/misc/fonts/DroidSans.ttf ABSOLUTE)
+target_link_libraries(core PUBLIC
+        Freetype::Freetype SDL2::SDL2 OpenGL::GL ${CMAKE_DL_LIBS} Threads::Threads ${MPI_CXX_LIBRARIES})
+
 set_target_properties(
         nb_cuda
         PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
-add_executable(nb_mpi ${CSC4005_PROJECT_SRC})
-add_executable(nb_pthread ${CSC4005_PROJECT_SRC})
-add_executable(nb_omp ${CSC4005_PROJECT_SRC})
-get_filename_component(FONT_PATH imgui/misc/fonts/DroidSans.ttf ABSOLUTE)
-target_link_libraries(core PUBLIC
-        Freetype::Freetype SDL2::SDL2 OpenGL::GL ${CMAKE_DL_LIBS} Threads::Threads ${MPI_CXX_LIBRARIES})
+
+target_compile_definitions(core PUBLIC -DImDrawIdx=unsigned)
+
 target_link_libraries(nb_mpi core)
 target_compile_options(nb_mpi PRIVATE -Werror -Wall -Wextra -Wpedantic)
-target_compile_definitions(core PUBLIC -DImDrawIdx=unsigned)
-target_compile_definitions(nb_mpi PRIVATE -DFONT_PATH=\"${FONT_PATH}\")
-target_compile_definitions(nb_mpi PRIVATE -DMPI)
+target_compile_definitions(nb_mpi PRIVATE -DFONT_PATH=\"${FONT_PATH}\" -DMPI)
+
 target_link_libraries(nb_pthread core)
 target_compile_options(nb_pthread PRIVATE -Werror -Wall -Wextra -Wpedantic)
-target_compile_definitions(nb_pthread PRIVATE -DFONT_PATH=\"${FONT_PATH}\")
-target_compile_definitions(nb_pthread PRIVATE -DPTHREAD)
+target_compile_definitions(nb_pthread PRIVATE -DFONT_PATH=\"${FONT_PATH}\" -DPTHREAD)
+
 target_link_libraries(nb_omp core)
 target_compile_options(nb_omp PRIVATE -Werror -Wall -Wextra -Wpedantic)
-target_compile_definitions(nb_omp PRIVATE -DFONT_PATH=\"${FONT_PATH}\")
-target_compile_definitions(nb_omp PRIVATE -DOPENMP)
+target_compile_definitions(nb_omp PRIVATE -DFONT_PATH=\"${FONT_PATH}\" -DOPENMP)
+
+target_link_libraries(nb_hybrid core)
+target_compile_options(nb_hybrid PRIVATE -Werror -Wall -Wextra -Wpedantic)
+target_compile_definitions(nb_hybrid PRIVATE -DFONT_PATH=\"${FONT_PATH}\" -DMPI -DHYBRID)
+
 target_link_libraries(nb_cuda core)
 target_compile_definitions(core PUBLIC -DImDrawIdx=unsigned)
 target_compile_definitions(nb_cuda PRIVATE -DFONT_PATH=\"${FONT_PATH}\")
@@ -64,10 +72,15 @@ target_link_libraries(nb_cuda ${CUDA_LIBRARIES})
 target_compile_options(nb_omp PRIVATE
           $<$<COMPILE_LANGUAGE:C>:${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}>
           $<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}>)
+target_compile_options(nb_hybrid PRIVATE
+          $<$<COMPILE_LANGUAGE:C>:${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}>
+          $<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}>)
 target_link_options(nb_omp PRIVATE ${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS} -fopenmp=libomp)
+target_link_options(nb_hybrid PRIVATE ${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS} -fopenmp=libomp)
 if (WIN32)
     target_link_options(nb_cuda BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
-endif()
-if (WIN32)
-    target_link_options(mpi BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
+    target_link_options(nb_mpi BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
+    target_link_options(nb_omp BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
+    target_link_options(nb_pthread BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
+    target_link_options(nb_hybrid BEFORE PRIVATE -lmingw32 -lSDL2main -lSDL2 -mwindows)
 endif()
