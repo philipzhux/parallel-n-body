@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     int gui_flag = 0;
     opterr = 0;
     int proc;
-    static int iteration_u = INT32_MAX;
+    static int iteration_u = 800;
     static float gravity = 100;
     static float space = 800;
     static float radius = 2;
@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
             }
             {
                 if(pool.get_iteration()==pool.get_iteration_u()) {
+                    std::cout<<"BODIES : "<<current_bodies<<std::endl;
                     std::cout<<"ITERATION TIMES : "<<pool.get_iteration()<<std::endl;
                     std::cout<<"DURATION (ns) : "<<pool.get_duration()<<std::endl;
                     std::cout<<"DURATION PER ITER: "<<(pool.get_duration()/pool.get_iteration())<<std::endl;
@@ -110,6 +111,7 @@ int main(int argc, char **argv) {
         while(true) {
             pool.master_cal(elapse, gravity, space, radius, proc, block_dim, g_dim);
             if(pool.get_iteration()==pool.get_iteration_u()) {
+                std::cout<<"BODIES : "<<current_bodies<<std::endl;
                 std::cout<<"ITERATION TIMES : "<<pool.get_iteration()<<std::endl;
                 std::cout<<"DURATION (ns) : "<<pool.get_duration()<<std::endl;
                 std::cout<<"DURATION PER ITER: "<<(pool.get_duration()/pool.get_iteration())<<std::endl;

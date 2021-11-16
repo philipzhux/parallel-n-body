@@ -109,6 +109,7 @@ void BodyPool::master_cal(double elapse,
         }
     }
     else {
+        proc++;
         Para* para = new Para[proc-1];
         pthread_t* threads = new pthread_t[proc-1];
         for(int i=0;i<static_cast<int>(proc-1);i++){

@@ -155,7 +155,7 @@ class BodyPool {
         std::vector<Body> my_partition;
         std::vector<Body> snapshot;
         Para* para = new Para;
-        std::cout<<"I am slave_cal from rank# "<<rank<<std::endl;
+        // std::cout<<"I am slave_cal from rank# "<<rank<<std::endl;
         while(true){
             MPI_Bcast(para, sizeof(Para), MPI_BYTE, 0, MPI_COMM_WORLD);
             if(para->terminate) break;
@@ -169,7 +169,7 @@ class BodyPool {
             MPI_Bcast(snapshot.data(), all_size*sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
             #ifdef HYBRID
             omp_set_num_threads(omp_get_max_threads());
-            std::cout<<"omp_get_max_threads PER task: "<<omp_get_max_threads()<<std::endl;
+            // std::cout<<"omp_get_max_threads PER task: "<<omp_get_max_threads()<<std::endl;
             #pragma omp parallel for default(shared)
             #endif
             for(size_t i=0; i<my_size; i++) {

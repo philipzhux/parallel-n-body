@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
         #endif
     }
     else {
-        static int iteration_u = INT32_MAX;
+        static int iteration_u = 800;
         static float gravity = 100;
         static float space = 800;
         static float radius = 2;
@@ -38,10 +38,6 @@ int main(int argc, char **argv) {
         static float elapse = 0.001;
         static ImVec4 color = ImVec4(1.0f, 1.0f, 0.4f, 1.0f);
         static float max_mass = 50;
-        static float current_space = space;
-        static float current_max_mass = max_mass;
-        static int current_bodies = bodies;
-        static int current_iteration_u = iteration_u;
         static int t = 1;
         int c;
         int gui_flag = 0;
@@ -72,7 +68,10 @@ int main(int argc, char **argv) {
                     break;
             }
         }
-        
+        static float current_space = space;
+        static float current_max_mass = max_mass;
+        static int current_bodies = bodies;
+        static int current_iteration_u = iteration_u;
         std::cout<<"interation_u = "<<iteration_u<<std::endl;
         BodyPool pool(static_cast<size_t>(bodies), space, max_mass, iteration_u);
         if(gui_flag){
@@ -126,6 +125,7 @@ int main(int argc, char **argv) {
                 }
                 {
                     if(pool.get_iteration()==pool.get_iteration_u()) {
+                        std::cout<<"BODIES : "<<current_bodies<<std::endl;
                         std::cout<<"ITERATION TIMES : "<<pool.get_iteration()<<std::endl;
                         std::cout<<"DURATION (ns) : "<<pool.get_duration()<<std::endl;
                         std::cout<<"DURATION PER ITER: "<<(pool.get_duration()/pool.get_iteration())<<std::endl;
@@ -152,6 +152,7 @@ int main(int argc, char **argv) {
         else {
             while(true) {
                 if(pool.get_iteration()==pool.get_iteration_u()) {
+                    std::cout<<"BODIES : "<<current_bodies<<std::endl;
                     std::cout<<"ITERATION TIMES : "<<pool.get_iteration()<<std::endl;
                     std::cout<<"DURATION (ns) : "<<pool.get_duration()<<std::endl;
                     std::cout<<"DURATION PER ITER: "<<(pool.get_duration()/pool.get_iteration())<<std::endl;
