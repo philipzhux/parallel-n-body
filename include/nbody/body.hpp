@@ -109,8 +109,8 @@ class BodyPool {
     public:
 
     static inline size_t getLength(const size_t &size, const size_t &proc, const size_t &rank){
-        if(size<(proc-1)) return (rank-1)<size;
-        return (size-rank+1)/(proc-1) + ((size-rank+1)%(proc-1) > 0); // ceil funct
+        if(size<proc) return rank<size;
+        return (size-rank)/proc + ((size-rank)%proc > 0); // ceil funct
     }
 
     BodyPool(size_t size, double position_range, double mass_range, int iteration_u);
@@ -162,7 +162,7 @@ class BodyPool {
             size_t all_size = para->size;
             size_t my_size = BodyPool::getLength(all_size,proc,rank);
             size_t my_start = 0;
-            for(size_t r=1;r<rank;r++) my_start += BodyPool::getLength(all_size,proc,r);
+            for(size_t r=0;r<rank;r++) my_start += BodyPool::getLength(all_size,proc,r);
             //std::cout<<"my_start of rank#"<<rank<<" : "<<my_start<<std::endl;
             my_partition.resize(my_size);
             snapshot.resize(all_size);
@@ -190,7 +190,7 @@ class BodyPool {
         size_t all_size = para->snapshot_ptr->size();
         size_t my_size = BodyPool::getLength(all_size,para->proc,para->tid);
         size_t my_start = 0;
-        for(int r=1;r<para->tid;r++) my_start += BodyPool::getLength(all_size,para->proc,r);
+        for(int r=0;r<para->tid;r++) my_start += BodyPool::getLength(all_size,para->proc,r);
         for(size_t i=my_start;i<my_start+my_size;++i){
             cnu((*(para->bodies_ptr))[i],para->radius,para->gravity,*(para->snapshot_ptr));
             (*(para->bodies_ptr))[i].update_for_tick(para->elapse, para->position_range, para->radius);

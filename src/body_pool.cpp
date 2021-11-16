@@ -76,7 +76,8 @@ void BodyPool::master_cal(double elapse,
         int* recvcounts = new int[proc];
         int* displs = new int[proc];
         int count = 0;
-        recvcounts[0] = 0;
+        recvcounts[0] = getLength(size(),proc,0)*sizeof(Body);
+        displs[0] = 0;
         for(size_t i=1;i<proc;i++){
             count += recvcounts[i-1]; //size of each row: sizeof(int)*size
             recvcounts[i] = getLength(size(),proc,i)*sizeof(Body);
@@ -84,6 +85,16 @@ void BodyPool::master_cal(double elapse,
         }
         MPI_Bcast(BodyPool::para, sizeof(Para), MPI_BYTE, 0, MPI_COMM_WORLD);
         MPI_Bcast(snapshot.data(), size()*sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
+        /** Let the master work as well **/
+        #ifdef HYBRID
+        omp_set_num_threads(omp_get_max_threads());
+        // std::cout<<"omp_get_max_threads PER task: "<<omp_get_max_threads()<<std::endl;
+        #pragma omp parallel for default(shared)
+        #endif
+        for(size_t i=0; i<recvcounts[0]; i++) {
+            cnu(bodies[i],para->radius,para->gravity,snapshot);
+            bodies[i].update_for_tick(para->elapse, para->position_range, para->radius);
+        }
         MPI_Gatherv(NULL,0,MPI_BYTE,bodies.data(),recvcounts,displs,MPI_BYTE,0,MPI_COMM_WORLD);
     }
     
@@ -109,16 +120,15 @@ void BodyPool::master_cal(double elapse,
         }
     }
     else {
-        proc++;
-        Para* para = new Para[proc-1];
-        pthread_t* threads = new pthread_t[proc-1];
-        for(int i=0;i<static_cast<int>(proc-1);i++){
+        Para* para = new Para[proc];
+        pthread_t* threads = new pthread_t[proc];
+        for(int i=0;i<static_cast<int>(proc);i++){
             para[i].elapse = elapse;
             para[i].gravity = gravity;
             para[i].position_range = position_range;
             para[i].radius = radius;
             para[i].proc = proc;
-            para[i].tid = i+1; //start with tid 1 consistent with mpi
+            para[i].tid = i;
             para[i].snapshot_ptr = &snapshot;
             para[i].bodies_ptr = &(BodyPool::bodies);
             pthread_create(threads+i,NULL,BodyPool::slave_cal,para+i);
