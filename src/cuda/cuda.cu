@@ -159,6 +159,13 @@ void master_cal_cu(double elapse,
         cudaMemcpy(device_bodies, bodies, size*sizeof(Body), cudaMemcpyHostToDevice);
         cudaMemcpy(device_snapshot, bodies, size*sizeof(Body), cudaMemcpyHostToDevice);
         slave_cal<<<g_dim,block_dim>>>(device_bodies, device_snapshot,size,elapse,gravity,position_range,radius);
+        cudaError_t cudaStatus;
+        cudaStatus = cudaGetLastError();
+        if (cudaStatus != cudaSuccess) {
+            printf("mykernel launch failed: %s\n",
+                    cudaGetErrorString(cudaStatus));
+            return;
+        }
         cudaDeviceSynchronize();
         cudaMemcpy(bodies, device_bodies, size*sizeof(Body), cudaMemcpyDeviceToHost);
         cudaFree(device_bodies);
