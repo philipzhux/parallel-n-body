@@ -86,16 +86,19 @@ void BodyPool::master_cal(double elapse,
         MPI_Bcast(BodyPool::para, sizeof(Para), MPI_BYTE, 0, MPI_COMM_WORLD);
         MPI_Bcast(snapshot.data(), size()*sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
         /** Let the master work as well **/
+        std::vector<Body> my_partition;
+        my_partition.resize(getLength(size(),proc,0));
         #ifdef HYBRID
         omp_set_num_threads(omp_get_max_threads());
         // std::cout<<"omp_get_max_threads PER task: "<<omp_get_max_threads()<<std::endl;
         #pragma omp parallel for default(shared)
         #endif
-        for(size_t i=0; i<recvcounts[0]; i++) {
-            cnu(bodies[i],para->radius,para->gravity,snapshot);
-            bodies[i].update_for_tick(para->elapse, para->position_range, para->radius);
+        for(size_t i=0; i<getLength(size(),proc,i); i++) {
+            my_partition[i] = bodies[i];
+            cnu(my_partition[i],para->radius,para->gravity,snapshot);
+            my_partition[i].update_for_tick(para->elapse, para->position_range, para->radius);
         }
-        MPI_Gatherv(NULL,0,MPI_BYTE,bodies.data(),recvcounts,displs,MPI_BYTE,0,MPI_COMM_WORLD);
+        MPI_Gatherv(my_partition.data(),recvcounts[0],MPI_BYTE,bodies.data(),recvcounts,displs,MPI_BYTE,0,MPI_COMM_WORLD);
     }
     
     auto end = std::chrono::high_resolution_clock::now();
@@ -108,6 +111,7 @@ void BodyPool::master_cal(double elapse,
                         double gravity,
                         double position_range,
                         double radius, size_t proc) {
+
     BodyPool::clear_acceleration();
     BodyPool::iteration++;
     auto begin = std::chrono::high_resolution_clock::now();
@@ -133,7 +137,7 @@ void BodyPool::master_cal(double elapse,
             para[i].bodies_ptr = &(BodyPool::bodies);
             pthread_create(threads+i,NULL,BodyPool::slave_cal,para+i);
         }
-        for(int i=0;i<static_cast<int>(proc-1);i++) pthread_join(threads[i],NULL);
+        for(int i=0;i<static_cast<int>(proc);i++) pthread_join(threads[i],NULL);
     }
     auto end = std::chrono::high_resolution_clock::now();
     duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();

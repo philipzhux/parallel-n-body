@@ -129,11 +129,11 @@ int main(int argc, char **argv) {
                         std::cout<<"ITERATION TIMES : "<<pool.get_iteration()<<std::endl;
                         std::cout<<"DURATION (ns) : "<<pool.get_duration()<<std::endl;
                         std::cout<<"DURATION PER ITER: "<<(pool.get_duration()/pool.get_iteration())<<std::endl;
-                        context->quit();
                         #ifdef MPI
                         pool.terminate_slave();
                         #endif
                         t = 0;
+                        context->quit();
                     }
                     const ImVec2 p = ImGui::GetCursorScreenPos();
                     //pool.update_for_tick(elapse, gravity, space, radius);
