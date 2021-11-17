@@ -1,6 +1,5 @@
 #include <nbody/body.hpp>
 
-
 BodyPool::BodyPool(size_t size, double position_range, double mass_range, int iteration_u):
         iteration{0},iteration_u{iteration_u},duration{0},bodies{} {
 
@@ -58,14 +57,14 @@ void BodyPool::master_cal(double elapse,
     BodyPool::iteration++;
     auto begin = std::chrono::high_resolution_clock::now();
     std::vector<Body> snapshot = BodyPool::bodies;
-    if(1==proc) {
-        /** SEQUENTIAL PART **/
-        for (auto &body: BodyPool::bodies) {
-            cnu(body,radius,gravity,snapshot);
-            body.update_for_tick(elapse, position_range, radius);
-        }
-    }
-    else {
+    // if(1==proc) {
+    //     /** SEQUENTIAL PART **/
+    //     for (auto &body: BodyPool::bodies) {
+    //         cnu(body,radius,gravity,snapshot);
+    //         body.update_for_tick(elapse, position_range, radius);
+    //     }
+    // }
+    // else {
         /** MPI IMPLEMENTATION **/
         BodyPool::para->elapse = elapse;
         BodyPool::para->gravity = gravity;
@@ -93,13 +92,13 @@ void BodyPool::master_cal(double elapse,
         // std::cout<<"omp_get_max_threads PER task: "<<omp_get_max_threads()<<std::endl;
         #pragma omp parallel for default(shared)
         #endif
-        for(size_t i=0; i<getLength(size(),proc,i); i++) {
+        for(size_t i=0; i<getLength(size(),proc,0); i++) {
             my_partition[i] = bodies[i];
             cnu(my_partition[i],para->radius,para->gravity,snapshot);
             my_partition[i].update_for_tick(para->elapse, para->position_range, para->radius);
         }
         MPI_Gatherv(my_partition.data(),recvcounts[0],MPI_BYTE,bodies.data(),recvcounts,displs,MPI_BYTE,0,MPI_COMM_WORLD);
-    }
+    //}
     
     auto end = std::chrono::high_resolution_clock::now();
     duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();
@@ -116,14 +115,14 @@ void BodyPool::master_cal(double elapse,
     BodyPool::iteration++;
     auto begin = std::chrono::high_resolution_clock::now();
     std::vector<Body> snapshot = BodyPool::bodies;
-    if(1==proc) {
-        /** SEQUENTIAL PART **/
-        for (auto &body: BodyPool::bodies) {
-            cnu(body,radius,gravity,snapshot);
-            body.update_for_tick(elapse, position_range, radius);
-        }
-    }
-    else {
+    // if(1==proc) {
+    //     /** SEQUENTIAL PART **/
+    //     for (auto &body: BodyPool::bodies) {
+    //         cnu(body,radius,gravity,snapshot);
+    //         body.update_for_tick(elapse, position_range, radius);
+    //     }
+    // }
+    // else {
         Para* para = new Para[proc];
         pthread_t* threads = new pthread_t[proc];
         for(int i=0;i<static_cast<int>(proc);i++){
@@ -138,7 +137,7 @@ void BodyPool::master_cal(double elapse,
             pthread_create(threads+i,NULL,BodyPool::slave_cal,para+i);
         }
         for(int i=0;i<static_cast<int>(proc);i++) pthread_join(threads[i],NULL);
-    }
+    //}
     auto end = std::chrono::high_resolution_clock::now();
     duration += duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }

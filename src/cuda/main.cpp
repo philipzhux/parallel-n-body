@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     int gui_flag = 0;
     opterr = 0;
     int proc;
-    static int iteration_u = 800;
+    static int iteration_u = 500;
     static float gravity = 100;
     static float space = 800;
     static float radius = 2;
@@ -19,13 +19,9 @@ int main(int argc, char **argv) {
     static float elapse = 0.001;
     static ImVec4 color = ImVec4(1.0f, 1.0f, 0.4f, 1.0f);
     static float max_mass = 50;
-    static float current_space = space;
-    static float current_max_mass = max_mass;
-    static int current_bodies = bodies;
-    static int current_iteration_u = iteration_u;
     static int t = 1;
-    static int g_dim = 4;
-    static int block_dim = 4;
+    static int g_dim = 2;
+    static int block_dim = 64;
     while ((c = getopt (argc, argv, "gi:b:e:x:y:")) != -1)
         switch (c)
         {
@@ -52,6 +48,10 @@ int main(int argc, char **argv) {
         default:
             break;
     }
+    static float current_space = space;
+    static float current_max_mass = max_mass;
+    static int current_bodies = bodies;
+    static int current_iteration_u = iteration_u;
     BodyPool pool(static_cast<size_t>(bodies), space, max_mass, iteration_u);
 
     if(gui_flag){

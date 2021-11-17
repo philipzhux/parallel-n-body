@@ -18,11 +18,11 @@ int main(int argc, char **argv) {
     #endif
     #ifdef PTHREAD
     rank = 0;
-    proc = 4;
+    proc = 16;
     #endif
     #ifdef OPENMP
     rank = 0;
-    proc = 4;
+    proc = 16;
     #endif
     if(0 != rank) {
         #ifdef MPI
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
         #endif
     }
     else {
-        static int iteration_u = 800;
+        static int iteration_u = 500;
         static float gravity = 100;
         static float space = 800;
         static float radius = 2;
