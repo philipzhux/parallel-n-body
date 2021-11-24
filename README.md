@@ -1,44 +1,45 @@
 
 # Parallel Computing: N-body Simulation
 ## Table of Contents
-- [Table of Contents](#table-of-contents)
-- [1. Introduction](#1-introduction)
-  - [1.1 Project abstact](#11-project-abstact)
-  - [1.2 N-body Simulation](#12-n-body-simulation)
-    - [The sequential implementation](#the-sequential-implementation)
-    - [The parallel implementations](#the-parallel-implementations)
-  - [1.3 How to run](#13-how-to-run)
-- [2. Methods](#2-methods)
-  - [2.1 Design process](#21-design-process)
-  - [2.2 Data structure forming](#22-data-structure-forming)
-  - [2.3 Sequantial Implementation](#23-sequantial-implementation)
-  - [2.3 Job partitions and distributions](#23-job-partitions-and-distributions)
-    - [MPI implementaitons](#mpi-implementaitons)
-    - [Pthread implementation](#pthread-implementation)
-    - [CUDA implementation](#cuda-implementation)
-    - [OpenMP implementation](#openmp-implementation)
-    - [Hybrid (OpenMP+MPI)](#hybrid-openmpmpi)
-  - [2.4 Local Calculation](#24-local-calculation)
-  - [2.5 Rusults gathering](#25-rusults-gathering)
-    - [MPI implementaitons](#mpi-implementaitons-1)
-    - [Pthread implementation](#pthread-implementation-1)
-    - [CUDA implementation](#cuda-implementation-1)
-    - [OpenMP implementation](#openmp-implementation-1)
-    - [Hybrid (OpenMP+MPI)](#hybrid-openmpmpi-1)
-  - [2.6 Performance analysis](#26-performance-analysis)
-    - [Profiling preparation](#profiling-preparation)
-    - [Testing on different number of cores/threads/node](#testing-on-different-number-of-coresthreadsnode)
-      - [MPI-like](#mpi-like)
-      - [Pthread-like](#pthread-like)
-      - [CUDA](#cuda)
-    - [Result analysis](#result-analysis)
-- [3. Results](#3-results)
-  - [3.1 GUI Results](#31-gui-results)
-  - [3.2 Performance analysis](#32-performance-analysis)
-    - [All but CUDA](#all-but-cuda)
-    - [CUDA Analysis](#cuda-analysis)
-- [4. Conslusion](#4-conslusion)
-- [5. Attachments](#5-attachments)
+- [Parallel Computing: N-body Simulation](#parallel-computing-n-body-simulation)
+  - [Table of Contents](#table-of-contents)
+  - [1. Introduction](#1-introduction)
+    - [1.1 Project abstact](#11-project-abstact)
+    - [1.2 N-body Simulation](#12-n-body-simulation)
+      - [The sequential implementation](#the-sequential-implementation)
+      - [The parallel implementations](#the-parallel-implementations)
+    - [1.3 How to run](#13-how-to-run)
+  - [2. Methods](#2-methods)
+    - [2.1 Design process](#21-design-process)
+    - [2.2 Data structure forming](#22-data-structure-forming)
+    - [2.3 Sequantial Implementation](#23-sequantial-implementation)
+    - [2.3 Job partitions and distributions](#23-job-partitions-and-distributions)
+      - [MPI implementaitons](#mpi-implementaitons)
+      - [Pthread implementation](#pthread-implementation)
+      - [CUDA implementation](#cuda-implementation)
+      - [OpenMP implementation](#openmp-implementation)
+      - [Hybrid (OpenMP+MPI)](#hybrid-openmpmpi)
+    - [2.4 Local Calculation](#24-local-calculation)
+    - [2.5 Rusults gathering](#25-rusults-gathering)
+      - [MPI implementaitons](#mpi-implementaitons-1)
+      - [Pthread implementation](#pthread-implementation-1)
+      - [CUDA implementation](#cuda-implementation-1)
+      - [OpenMP implementation](#openmp-implementation-1)
+      - [Hybrid (OpenMP+MPI)](#hybrid-openmpmpi-1)
+    - [2.6 Performance analysis](#26-performance-analysis)
+      - [Profiling preparation](#profiling-preparation)
+      - [Testing on different number of cores/threads/node](#testing-on-different-number-of-coresthreadsnode)
+        - [MPI-like](#mpi-like)
+        - [Pthread-like](#pthread-like)
+        - [CUDA](#cuda)
+      - [Result analysis](#result-analysis)
+  - [3. Results](#3-results)
+    - [3.1 GUI Results](#31-gui-results)
+    - [3.2 Performance analysis](#32-performance-analysis)
+      - [All but CUDA](#all-but-cuda)
+      - [CUDA Analysis](#cuda-analysis)
+  - [4. Conslusion](#4-conslusion)
+  - [5. Attachments](#5-attachments)
 
 ## 1. Introduction
 ### 1.1 Project abstact
@@ -176,15 +177,8 @@ An illustration of the staic scheduling approach is showned as below:
 
 <figure align="center"  style="width: 100%;">
 
-```mermaid
-graph TD;
+![fg1](https://i.imgur.com/fDVmBXs.png)
 
-    A["Construct Sequential Version"]-->B["Partitioning and Distributing Bodies"];
-    B-->C["Local Iterations"];
-    C--"WHEN ITERATIONS FINISH"-->F["Gather All Local Iterations time to Construct the Final Result"];
-    F-->H["Performance Analysis by Testing Different Core# and Body#"];
-```
-<figcaption>Figure 1: Overall Design Process</figcaption>
 </figure>
 
 Note that this is a uniform design idea suitable for all the implementations, with minor changes only.
@@ -467,3 +461,5 @@ On top of that, the speedup of hybrid OpenMP MPI implementation is not as good a
 
 ## 5. Attachments
 * ```attachments/raw_res.tar```: The raw output files from which the above result is retrieved.
+
+  *>>> Attachments not uploaded to github*
